@@ -147,3 +147,5 @@ usethis::use_github()
 # Replace with your actual name and GitHub email
 usethis::use_git_config(user.name = "Imran ul Haque Qureshi", user.email = "ihqureshi02@gmail.com")
 
+usethis::create_github_token()
+gitcreds::gitcreds_set()

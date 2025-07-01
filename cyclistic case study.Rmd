@@ -1,0 +1,149 @@
+---
+title: "Cyclistic Bike-Share Case Study"
+author: "Imran ul Haque Qureshi"
+subtitle: "Google Data Analytics Capstone"
+output:
+  github_document: default
+  xaringan::moon_reader:
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+# Business Task
+
+- **Goal**: Help Cyclistic convert **casual riders** into **annual members**
+- Compare behavior between casual vs. member riders
+- Use insights to propose targeted marketing strategies
+
+---
+
+# About Cyclistic
+
+- Chicago-based bike-share company  
+- 5,800+ bikes, 600+ stations
+- Types: standard, reclining, hand tricycles, cargo bikes
+- Plans: single-ride, day-pass, annual membership
+- 30% of riders commute, rest ride for leisure
+
+---
+
+# Key Stakeholders
+
+- **Lily Moreno**: Director of Marketing
+- **Marketing Analytics Team**
+- **Cyclistic Executives** (decision-makers)
+
+---
+
+# Tools & Data
+
+- Tool: **RStudio + tidyverse + ggplot**
+- Source: Divvy Trip Data (May 2022 – April 2023)
+- Public dataset licensed by Motivate International
+- 12 CSVs merged into 1 dataset
+
+---
+
+# Cleaning & Preparation
+
+- Removed empty columns, NA values, duplicates
+- Calculated `ride_length` (in minutes)
+- Created `day_of_week` using `wday()` from lubridate
+- Removed rows with negative ride lengths
+- Verified consistency across all months
+
+---
+
+# Summary Statistics
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(lubridate)
+
+bike_data <- read_csv("cyclistic_tripdata_cleaned.csv")
+
+bike_data <- bike_data %>%
+  mutate(ride_length = as.numeric(difftime(ended_at, started_at, units = "mins")),
+         day_of_week = wday(started_at, label = TRUE)) %>%
+  filter(ride_length > 0)
+
+bike_data %>%
+  group_by(member_casual) %>%
+  summarise(
+    avg_ride = round(mean(ride_length),1),
+    median_ride = round(median(ride_length),1),
+    max_ride = round(max(ride_length),1),
+    number_of_rides = n()
+  )
+
+
+#Rides by Day of Week
+
+bike_data %>%
+  group_by(member_casual, day_of_week) %>%
+  summarise(number_of_rides = n()) %>%
+  ggplot(aes(x = day_of_week, y = number_of_rides, fill = member_casual)) +
+  geom_col(position = "dodge") +
+  labs(title = "Number of Rides by Rider Type & Day",
+       x = "Day of Week", y = "Number of Rides")
+
+# Average Ride Duration by Day
+
+bike_data %>%
+  group_by(member_casual, day_of_week) %>%
+  summarise(avg_duration = mean(ride_length)) %>%
+  ggplot(aes(x = day_of_week, y = avg_duration, fill = member_casual)) +
+  geom_col(position = "dodge") +
+  labs(title = "Avg Ride Duration by Rider Type & Day",
+       x = "Day of Week", y = "Duration (minutes)")
+```
+
+# Key Insights
+
+- Casual riders take longer rides, especially on weekends
+- Members take shorter, more frequent rides, mostly on weekdays
+- Suggests: casual = leisure, members = commuters
+
+
+---
+
+# Recommendations
+
+- 🎯 Weekend Promotions
+  Offer discounts on annual plans to weekend riders
+
+- 📱 Targeted Digital Ads
+  Use ride history to promote commuting benefits
+
+- 🎁 Membership Perks
+  Free helmet rental, exclusive bikes, or partner rewards
+  
+
+# Conclusion
+
+- Clear differences in how each rider type uses bikes
+
+- Data supports marketing segmentation
+
+- Digital outreach + perks can drive membership conversion
+
+# Thank You! 🙌
+Created in RStudio using Tidyverse + Ggplot
+
+Data: Divvy Bike Share (2022–2023)
+
+Analysis by: Imran Qureshi
+
+
+
+```{r}
+install.packages("usethis")
+usethis::use_git()
+usethis::use_github()
+```
+
+# Replace with your actual name and GitHub email
+usethis::use_git_config(user.name = "Imran ul Haque Qureshi", user.email = "ihqureshi02@gmail.com")
+

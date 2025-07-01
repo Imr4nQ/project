@@ -1,0 +1,215 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Cyclistic Bike-Share Case Study},
+  pdfauthor={Imran ul Haque Qureshi},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Cyclistic Bike-Share Case Study}
+\author{Imran ul Haque Qureshi}
+\date{2025-07-01}
+
+\begin{document}
+\maketitle
+
+\section{Business Task}\label{business-task}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Goal}: Help Cyclistic convert \textbf{casual riders} into
+  \textbf{annual members}
+\item
+  Compare behavior between casual vs.~member riders
+\item
+  Use insights to propose targeted marketing strategies
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{About Cyclistic}\label{about-cyclistic}
+
+\begin{itemize}
+\tightlist
+\item
+  Chicago-based bike-share company\\
+\item
+  5,800+ bikes, 600+ stations
+\item
+  Types: standard, reclining, hand tricycles, cargo bikes
+\item
+  Plans: single-ride, day-pass, annual membership
+\item
+  30\% of riders commute, rest ride for leisure
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Key Stakeholders}\label{key-stakeholders}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Lily Moreno}: Director of Marketing
+\item
+  \textbf{Marketing Analytics Team}
+\item
+  \textbf{Cyclistic Executives} (decision-makers)
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Tools \& Data}\label{tools-data}
+
+\begin{itemize}
+\tightlist
+\item
+  Tool: \textbf{RStudio + tidyverse + ggplot}
+\item
+  Source: Divvy Trip Data (May 2022 -- April 2023)
+\item
+  Public dataset licensed by Motivate International
+\item
+  12 CSVs merged into 1 dataset
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Cleaning \& Preparation}\label{cleaning-preparation}
+
+\begin{itemize}
+\tightlist
+\item
+  Removed empty columns, NA values, duplicates
+\item
+  Calculated \texttt{ride\_length} (in minutes)
+\item
+  Created \texttt{day\_of\_week} using \texttt{wday()} from lubridate
+\item
+  Removed rows with negative ride lengths
+\item
+  Verified consistency across all months
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Summary Statistics}\label{summary-statistics}
+
+```\{r echo=FALSE, message=FALSE, warning=FALSE\} library(tidyverse)
+library(lubridate)
+
+bike\_data \textless- read\_csv(``cyclistic\_tripdata\_cleaned.csv'')
+
+bike\_data \textless- bike\_data \%\textgreater\% mutate(ride\_length =
+as.numeric(difftime(ended\_at, started\_at, units = ``mins'')),
+day\_of\_week = wday(started\_at, label = TRUE)) \%\textgreater\%
+filter(ride\_length \textgreater{} 0)
+
+bike\_data \%\textgreater\% group\_by(member\_casual) \%\textgreater\%
+summarise( avg\_ride = round(mean(ride\_length),1), median\_ride =
+round(median(ride\_length),1), max\_ride = round(max(ride\_length),1),
+number\_of\_rides = n() )
+
+\#\#Rides by Day of Week
+
+bike\_data \%\textgreater\% group\_by(member\_casual, day\_of\_week)
+\%\textgreater\% summarise(number\_of\_rides = n()) \%\textgreater\%
+ggplot(aes(x = day\_of\_week, y = number\_of\_rides, fill =
+member\_casual)) + geom\_col(position = ``dodge'') + labs(title =
+``Number of Rides by Rider Type \& Day'', x = ``Day of Week'', y =
+``Number of Rides'')
+
+\#\#Average Ride Duration by Day
+
+bike\_data \%\textgreater\% group\_by(member\_casual, day\_of\_week)
+\%\textgreater\% summarise(avg\_duration = mean(ride\_length))
+\%\textgreater\% ggplot(aes(x = day\_of\_week, y = avg\_duration, fill =
+member\_casual)) + geom\_col(position = ``dodge'') + labs(title = ``Avg
+Ride Duration by Rider Type \& Day'', x = ``Day of Week'', y =
+``Duration (minutes)'')
+
+\#\#Key Insights Casual riders take longer rides, especially on weekends
+
+Members take shorter, more frequent rides, mostly on weekdays
+
+Suggests: casual = leisure, members = commuters
+
+\subsection{Recommendations}\label{recommendations}
+
+🎯 Weekend Promotions Offer discounts on annual plans to weekend riders
+
+📱 Targeted Digital Ads Use ride history to promote commuting benefits
+
+🎁 Membership Perks Free helmet rental, exclusive bikes, or partner
+rewards
+
+\subsection{Conclusion}\label{conclusion}
+
+Clear differences in how each rider type uses bikes
+
+Data supports marketing segmentation
+
+Digital outreach + perks can drive membership conversion
+
+\end{document}

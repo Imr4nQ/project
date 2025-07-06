@@ -60,5 +60,5 @@ If you're viewing on GitHub:
 
 ## 🧠 About This Project
 
-This is part of the **Google Data Analytics Professional Certificate** capstone project. Completed by **Imran ul Haque Qureshi** in RStudio. Feel free to fork, learn, and adapt.
+This is part of the **Google Data Analytics Professional Certificate** capstone project. Completed by **Imran ul Haque Qureshi** in RStudio. 
 
